@@ -66,20 +66,36 @@
                                 <h4 class="mb-3">some text</h4>
                                 <form class="needs-validation" novalidate>
                                     <div class="row">
-                                        <div class="col-md-4 mb-3">
+                                        <div class="col-md-6 mb-3">
                                             <label for="makeBake">Make</label>
-                                            <select class="selectpicker" v-on:change="changeModel" id="makeBake" data-width="auto" multiple title="Choose one of the following...">
+                                            <select v-on:change="changeModel" id="makeBake" data-width="auto" multiple title="Choose one of the following...">
                                             </select>
-                                            <input v-model="message" placeholder="отредактируй меня">
-                                            <p>Введённое сообщение: {{message}}</p>
+
+                                            <!--<input type="text" class="forsm-control" id="firstName" placeholder="" value="" required>-->
+                                            <!--<div class="invalid-feedback">-->
+                                                <!--Valid first name is required.-->
+                                            <!--</div>-->
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label for="modelBake">Model</label>
+                                            <select id="modelBake" v-on:change="changeYear" data-width="auto" multiple title="Choose one of the following...">
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label for="startYearBake">startYear</label>
+                                            <select id="startYearBake" data-width="auto" multiple title="Choose one of the following...">
+                                            </select>
+
                                             <!--<input type="text" class="form-control" id="firstName" placeholder="" value="" required>-->
                                             <!--<div class="invalid-feedback">-->
                                                 <!--Valid first name is required.-->
                                             <!--</div>-->
                                         </div>
-                                        <div class="col-md-4 mb-3">
-                                            <label for="modelBake">Model</label>
-                                            <select class="selectpicker" id="modelBake" data-width="auto" multiple title="Choose one of the following...">
+                                        <div class="col-md-6 mb-3">
+                                            <label for="endYearBake">endYear</label>
+                                            <select id="endYearBake" data-width="auto" multiple title="Choose one of the following...">
                                             </select>
                                         </div>
                                     </div>
@@ -106,26 +122,119 @@
 
 <script>
     export default {
-        props : ['make','model','message'],
+        props : ['make','model','start_year','end_year'],
         mounted() {
-            var make = this.make;
-            for (var key in make) {
-                $("#makeBake").append("<option>"+make[key]+"</option>");
-            }
-            var model = this.model;
-            for (var key in model) {
-                $("#modelBake").append("<option>"+model[key]+"</option>");
-            }
+            console.log(this.model);
+            let make = this.make;
+            this.createSelect($("#makeBake"),make);
+
+            let end_year = this.end_year;
+            this.createSelect($("#endYearBake"),end_year);
+
+            this.resetModels();
+            this.resetYears();
         },
         methods: {
-            changeModel: function (event) {
-                // `this` внутри методов указывает на экземпляр Vue
-                // `event` — нативное событие DOM
+            changeSelect: function (func,el,event) {
                 if (event) {
-                    console.log($(event.target).val());
-                    console.log(this.model);
+                    let selected = $(event.target).val();
+                    let values = [];
+                    for (let key in selected){
+                        values[key] = func(selected[key]);
+                    }
+                    if(selected == false){
+                        values = func([])
+                        if(values === null){
+                            return;
+                        }
+                    }
+                    this.createSelect(el,values);
                 }
+            },
+
+            changeModel: function (event) {
+                let model = this.model;
+                let resetModel = this.resetModels();
+                let resetYears = this.resetYears();
+                this.changeSelect(function(selected){
+                    if(selected == false){
+                        resetModel;
+                        resetYears;
+                        return null;
+                    }
+                    return model[selected];
+
+                },$("#modelBake"),event);
+            },
+
+            changeYear: function (event) {
+                let start_year = this.start_year;
+                let resetYears = this.resetYears();
+                this.changeSelect(function(selected){
+                    if(selected == false){
+                        resetYears;
+                        return null;
+                    }
+                    return start_year[selected];
+                },$("#startYearBake"),event);
+            },
+
+            createSelect: function (el,data) {
+                el.find('option').remove();
+                let elems = [];
+                for (let key in data) {
+                    if(Array.isArray(data[key])){
+                        for (var key_elem in data[key]){
+                            elems[data[key][key_elem]] = data[key][key_elem];
+                        }
+                    }else {
+                        elems[data[key]] = data[key];
+                    }
+                }
+                elems.sort(compareNumeric);
+                for (let key in elems) {
+                    el.append("<option>"+elems[key]+"</option>");
+                }
+                el.selectpicker('refresh');
+            },
+
+            resetSelects: function () {
+                this.resetYears();
+            },
+            resetYears: function () {
+                let cnt = 0;
+                let allYears = [];
+                let start_year = this.start_year;
+                for (let key in start_year){
+                    for (let key1 in start_year[key]){
+                        allYears[cnt] = start_year[key][key1];
+                        cnt++;
+                    }
+                }
+                this.createSelect($("#startYearBake"),allYears);
+            },
+            resetModels: function () {
+                let cnt = 0;
+                let allYears = [];
+                let start_year = this.model;
+                for (let key in start_year){
+                    for (let key1 in start_year[key]){
+                        allYears[cnt] = start_year[key][key1];
+                        cnt++;
+                    }
+                }
+                this.createSelect($("#modelBake"),start_year);
             }
         }
     }
+
+    function compareNumeric(a, b) {
+        if (a > b) return 1;
+        if (a < b) return -1;
+    }
+    function getKeyByValue(object, value) {
+        return Object.keys(object).find(key => object[key] === value);
+    }
+
+
 </script>

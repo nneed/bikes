@@ -2,33 +2,22 @@
 
 namespace App\Http\Controllers;
 
-use App\Bike;
-use App\Http\Requests\StorePhoto;
-use Illuminate\Http\Request;
-use App\Photo;
-use Illuminate\Support\Facades\Storage;
+use App\UseCases\FilterService;
 
 class BikeController extends Controller
 {
 
+    public $service;
+
+    public function __construct(FilterService $service)
+    {
+        $this->service = $service;
+    }
+
     public function Index()
     {
-        $bikes = Bike::all();
-        $make = $bikes->pluck('Model','Make');
-      //  dd($make);
-        $make = $make->map(function ($item, $key) {
-            return trim($item);
-        });
-        $make = $make->unique();
-
-        $model = $bikes->pluck(['Make','Model']);
-        $model = $model->map(function ($item, $key) {
-            return trim($item);
-        });
-        $model = $model->unique();
-
-//        dd($model);
-        return view('bike.index', ['make' => $make,'model'=>$model]);
+        $data = $this->service->getDataForFilter();
+        return view('bike.index', $data);
     }
 
 }

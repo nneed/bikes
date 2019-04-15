@@ -27,7 +27,7 @@ Vue.component('bike-filter', require('./components/BikeFilterComponent.vue').def
  * or customize the JavaScript scaffolding to fit your unique needs.
  */
 
-const app = new Vue({
+var app = new Vue({
     el: '.bike-filter'
 });
 
