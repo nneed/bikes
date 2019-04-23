@@ -65,10 +65,11 @@
                             <div class="col-md-12 order-md-1">
                                 <h4 class="mb-3">some text</h4>
                                 <form class="needs-validation" novalidate>
+
                                     <div class="row">
                                         <div class="col-md-6 mb-3">
-                                            <label for="makeBake">Make</label>
-                                            <select v-on:change="changeModel" id="makeBake" data-width="auto" multiple title="Choose one of the following...">
+                                            <label for="Make">Make</label>
+                                            <select name="Make" v-on:change="changeModel" id="Make" data-width="auto" multiple title="Choose one of the following...">
                                             </select>
 
                                             <!--<input type="text" class="forsm-control" id="firstName" placeholder="" value="" required>-->
@@ -77,15 +78,15 @@
                                             <!--</div>-->
                                         </div>
                                         <div class="col-md-6 mb-3">
-                                            <label for="modelBake">Model</label>
-                                            <select id="modelBake" v-on:change="changeYear" data-width="auto" multiple title="Choose one of the following...">
+                                            <label for="Model">Model</label>
+                                            <select name="Model" id="Model" v-on:change="changeYear" data-width="auto" multiple title="Choose one of the following...">
                                             </select>
                                         </div>
                                     </div>
                                     <div class="row">
                                         <div class="col-md-6 mb-3">
-                                            <label for="startYearBake">startYear</label>
-                                            <select id="startYearBake" data-width="auto" multiple title="Choose one of the following...">
+                                            <label for="StartYr">startYear</label>
+                                            <select name="StartYr" id="StartYr"  data-width="auto" multiple title="Choose one of the following...">
                                             </select>
 
                                             <!--<input type="text" class="form-control" id="firstName" placeholder="" value="" required>-->
@@ -94,8 +95,8 @@
                                             <!--</div>-->
                                         </div>
                                         <div class="col-md-6 mb-3">
-                                            <label for="endYearBake">endYear</label>
-                                            <select id="endYearBake" data-width="auto" multiple title="Choose one of the following...">
+                                            <label for="EndYr">endYear</label>
+                                            <select name="EndYr" id="EndYr" data-width="auto" multiple title="Choose one of the following...">
                                             </select>
                                         </div>
                                     </div>
@@ -122,17 +123,17 @@
 
 <script>
     export default {
-        props : ['make','model','start_year','end_year'],
+        props : ['selected','make','model','start_year','end_year'],
         mounted() {
-            console.log(this.model);
             let make = this.make;
-            this.createSelect($("#makeBake"),make);
+            this.createSelect($("#Make"),make);
 
             let end_year = this.end_year;
-            this.createSelect($("#endYearBake"),end_year);
+            this.createSelect($("#EndYr"),end_year);
 
-            this.resetModels();
             this.resetYears();
+
+            this.changeModel();
         },
         methods: {
             changeSelect: function (func,el,event) {
@@ -152,19 +153,29 @@
                 }
             },
 
-            changeModel: function (event) {
+            changeModel: function () {
                 let model = this.model;
                 let resetModel = this.resetModels();
                 let resetYears = this.resetYears();
-                this.changeSelect(function(selected){
-                    if(selected == false){
-                        resetModel;
-                        resetYears;
-                        return null;
-                    }
-                    return model[selected];
+                let selected = [];
+                if(event){
+                    selected = $(event.target).val();
+                }else{
+                    selected = this.selected['Make'];
+                }
 
-                },$("#modelBake"),event);
+                let values = [];
+
+                for (let key in selected){
+                    values[key] = model[selected[key]] ;
+                }
+                if(selected == false || selected == undefined){
+                    resetModel;
+                    resetYears;
+
+                    return;
+                }
+                this.createSelect($("#Model"),values);
             },
 
             changeYear: function (event) {
@@ -176,12 +187,33 @@
                         return null;
                     }
                     return start_year[selected];
-                },$("#startYearBake"),event);
+                },$("#StartYr"),event);
+
+                let end_year = this.end_year;
+                this.changeSelect(function(selected){
+                    if(selected == false){
+                        resetYears;
+                        return null;
+                    }
+                    return end_year[selected];
+                },$("#EndYr"),event);
+            },
+            changeEndYear: function (event){
+                let end_year = this.end_year;
+                this.changeSelect(function(selected){
+                    if(selected == false){
+                       // resetYears;
+                        return null;
+                    }
+
+                    return end_year[selected];
+                },$("#endYearBake"),event);
             },
 
             createSelect: function (el,data) {
                 el.find('option').remove();
                 let elems = [];
+                let selected_array = this.selected[el.attr('id')];
                 for (let key in data) {
                     if(Array.isArray(data[key])){
                         for (var key_elem in data[key]){
@@ -194,6 +226,9 @@
                 elems.sort(compareNumeric);
                 for (let key in elems) {
                     el.append("<option>"+elems[key]+"</option>");
+                }
+                if(selected_array){
+                    el.selectpicker('val', selected_array);
                 }
                 el.selectpicker('refresh');
             },
@@ -211,7 +246,7 @@
                         cnt++;
                     }
                 }
-                this.createSelect($("#startYearBake"),allYears);
+                this.createSelect($("#StartYr"),allYears);
             },
             resetModels: function () {
                 let cnt = 0;
@@ -223,7 +258,7 @@
                         cnt++;
                     }
                 }
-                this.createSelect($("#modelBake"),start_year);
+                this.createSelect($("#Model"),start_year);
             }
         }
     }
