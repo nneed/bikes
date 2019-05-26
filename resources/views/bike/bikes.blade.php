@@ -1,5 +1,5 @@
         <div class="container">
-            <div class="card text-center">
+            <div class="card text-center mt-3">
                 <div class="card-header">
                     {{$bike->Make}}
                 </div>

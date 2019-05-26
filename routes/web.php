@@ -22,6 +22,7 @@ Route::group(
 //        'middleware' => ['auth'],
     ],
     function () {
-        Route::get('/', 'BikeController@index')->name('listBikes');
+        Route::get('/', 'BikeController@index')->name('filter');
+        Route::post('/', 'BikeController@getBikes')->name('listBikes');
     }
 );

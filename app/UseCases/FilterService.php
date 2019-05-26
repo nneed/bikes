@@ -22,10 +22,64 @@ class FilterService
         });
         $make = $make->unique();
 
-        $model = $bikes->mapToGroups(function ($item, $key) {
+        $cylinders = $bikes->mapToGroups(function ($item, $key) {
             $arr = [];
             $key = trim(str_replace('  ',' ',$item->Make));
-            $arr[$key] = $item->Model;
+            $arr[$key] = $item->EngCylinders;
+            return $arr;
+        });
+
+        $gears = $bikes->mapToGroups(function ($item, $key) {
+            $arr = [];
+            $key = trim(str_replace('  ',' ',$item->Make));
+            $arr[$key] = $item->EngGearQty;
+            return $arr;
+        });
+
+        $wheelDiaRear = $bikes->mapToGroups(function ($item, $key) {
+            $arr = [];
+            $key = trim(str_replace('  ',' ',$item->Make));
+            $arr[$key] = $item->WheelDiaRear;
+            return $arr;
+        });
+
+        $wheelDiaFrt = $bikes->mapToGroups(function ($item, $key) {
+            $arr = [];
+            $key = trim(str_replace('  ',' ',$item->Make));
+            $arr[$key] = $item->WheelDiaFrt;
+            return $arr;
+        });
+
+
+        $filteredWheelType = $bikes->reject(function ($value, $key) {
+            return $value->WheelType == '';
+        });
+        $wheelType = $filteredWheelType->mapToGroups(function ($item, $key) {
+            $arr = [];
+            $key = trim(str_replace('  ',' ',$item->Make));
+            $arr[$key] = $item->WheelType;
+            return $arr;
+        });
+
+
+        $filteredbikeABS = $bikes->reject(function ($value, $key) {
+            return $value->BikeABS == '';
+        });
+        $bikeABS = $filteredbikeABS->mapToGroups(function ($item, $key) {
+            $arr = [];
+            $key = trim(str_replace('  ',' ',$item->Make));
+            $arr[$key] = $item->BikeABS;
+            return $arr;
+        });
+
+        $filteredBikeTC = $bikes->reject(function ($value, $key) {
+            return $value->BikeTC == '';
+        });
+
+        $bikeTC = $filteredBikeTC->mapToGroups(function ($item, $key) {
+            $arr = [];
+            $key = trim(str_replace('  ',' ',$item->Make));
+            $arr[$key] = $item->BikeTC;
             return $arr;
         });
 
@@ -44,7 +98,6 @@ class FilterService
         });
 
 
-
         /**
          * model->make
          * year->model
@@ -52,41 +105,19 @@ class FilterService
 
         $data = [
             'make' => $make,
-            'model'=>$model,
+            'cylinders'=> $cylinders,
           //  'modelCode'=>$model,
             'startYear'=>$startYear,
             'endYear'=>$endYear,
-//            'EngDisp'=>$model,
-//            'EngMaxPwr'=>$model,
-//            'EngMaxPwrRPM'=>$model,
-//            'EngMaxTrq'=>$model,
-//            'EngMaxTrq'=>$model,
-//            'EngMaxTrqRPM'=>$model,
-//            'EngFueling'=>$model,
-//            'EngFueling'=>$model,
-//            'EngCooling'=>$model,
-//            'EngCylinders'=>$model,
-//            'EngCylinders'=>$model,
-//            'EngGearQty'=>$model,
-//            'EngSvcInterval'=>$model,
-//            'BikeWtDry'=>$model,
-//            'BikeWtWet'=>$model,
-//            'BikeWtWet'=>$model,
-//            'BikeWtWetEst'=>$model,
-//            'BikeFuelCap'=>$model,
-//            'WheelTravelFrt'=>$model,
-//            'WheelTravelRear'=>$model,
-//            'WheelTravelRear'=>$model,
-//            'WheelDiaRear'=>$model,
-//            'WheelDiaFrt'=>$model,
-//            'WheelType'=>$model,
-//            'BikeFuelEconSpec'=>$model,
-//            'FuellyData'=>$model,
-//            'FuellyData'=>$model,
-//            'BikeFuelEconComb'=>$model,
-//            'BikeABS'=>$model,
-//            'BikeTC'=>$model,
+            'gears'=>$gears,
+            'wheelDiaRear'=>$wheelDiaRear,
+            'wheelDiaFrt'=>$wheelDiaFrt,
+            'wheelType'=>$wheelType,
+            'bikeABS'=>$bikeABS,
+            'bikeTC'=>$bikeTC,
+
         ];
+
         return $data;
     }
 }
