@@ -49,7 +49,17 @@ class BikeController extends Controller
         if ($selected_params){
             $bikes = Bike::query();
             foreach ($selected_params as $key_param => $params){
-                $bikes->orWhereIn($key_param,str_replace("+",' ',$params));
+//                dd($key_param);
+                $bikes->where(function ($query) use ($params,$key_param) {
+                    foreach ($params as $param){
+                        $query->orWhere($key_param, '=', $param);
+                    }
+
+                });
+//                foreach ($params as $param){
+//                    $bikes->orWhere($key_param,null,$param);
+//                }
+//                $bikes->orWhereIn($key_param,str_replace("+",' ',$params));
             }
             /*PAGINATION*/
            // $bikes = $bikes->simplePaginate(5);
